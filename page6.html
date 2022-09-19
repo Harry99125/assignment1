@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+body {
+	background-color: #88FF83;
+}
+</style>
+<meta charset="utf-8">
+</head>
+<body onload="startGame()">
+<script>
+
+var GamePiece;
+
+function startGame() {
+    GamePiece = new component(30, 30, "blue", 10, 120);
+	score  = new component1(40, 40, "red", 40, 40);    
+    GameArea.start();
+}
+
+var GameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 20);
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+function component1(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        c = GameArea.context;
+        c.fillStyle = color;
+        c.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.crashWith = function(other) {
+        var myleft = this.x;
+        var myright = this.x + this.width;
+        var mytop = this.y;
+        var mybottom = this.y + this.height;
+        var otherleft = other.x;
+        var otherright = other.x + other.width;
+        var othertop = other.y;
+        var otherbottom = other.y + other.height;
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+function component(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.x = x;
+    this.y = y;    
+   
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+		if(this.x>480||this.x<0||this.y>270||this.y<0){
+			this.x=240;
+			this.y=135;
+			  this.speedX = 0;
+    this.speedY = 0;
+		}
+    } 
+	
+	 this.update = function() {
+		   c = GameArea.context;
+    c.fillStyle = color;
+     c.beginPath();     
+    c.moveTo(this.x, this.y);  
+    c.lineTo(this.x+50, this.y+25); 
+    c.lineTo(this.x,this.y+50); 
+    c.closePath();    
+  
+    c.fill();
+	
+	
+    }
+}
+
+function updateGameArea() {
+	
+     if (score.crashWith(GamePiece)) {
+      score.x=Math.floor(Math.random() * 450);
+		 score.y=Math.floor(Math.random() * 250);
+	 }
+    GameArea.clear();
+    GamePiece.newPos();
+	 score.update();
+    GamePiece.update();
+}
+
+function up() {
+    GamePiece.speedY -= 1; 
+}
+
+function down() {
+    GamePiece.speedY += 1; 
+}
+
+function left() {
+    GamePiece.speedX -= 1; 
+}
+
+function right() {
+    GamePiece.speedX += 1; 
+}
+</script>
+<div style="text-align:center;width:480px;">
+  <button onclick="up()">UP</button><br><br>
+  <button onclick="left()">LEFT</button>
+  <button onclick="right()">RIGHT</button><br><br>
+  <button onclick="down()">DOWN</button>
+</div>
+
+</body>
+</html>
